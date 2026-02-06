@@ -529,3 +529,112 @@ FROM students s
 LEFT JOIN enrollments e ON s.student_id = e.student_id
 LEFT JOIN courses c ON e.course_id = c.course_id;
 
+
+-- Set Operators 
+
+
+CREATE TABLE students_a (
+    student_id INT,
+    name VARCHAR(50),
+    course VARCHAR(50)
+);
+
+
+INSERT INTO students_a (student_id, name, course) 
+VALUES
+        (1, 'Akhilesh', 'CSE'),
+        (2, 'Rahul', 'ECE'),
+        (3, 'Sneha', 'ME'),
+        (4, 'Priya', 'CSE');
+
+
+CREATE TABLE students_b (
+    student_id INT,
+    name VARCHAR(50),
+    course VARCHAR(50)
+);
+
+
+INSERT INTO students_b (student_id, name, course) 
+VALUES
+        (3, 'Sneha', 'ME'),
+        (4, 'Priya', 'CSE'),
+        (5, 'Aman', 'EE'),
+        (6, 'Neha', 'CSE');
+
+
+-- Union operator
+
+SELECT * FROM students_a
+UNION
+SELECT * FROM students_b;
+
+
+-- Union All operator 
+SELECT * FROM students_a
+UNION ALL
+SELECT * FROM students_b ;
+
+
+-- EXCEPT OPERATOR 
+
+SELECT * FROM students_a
+EXCEPT
+SELECT * FROM students_b ;
+
+
+
+-- INTERSECT OPERATOR
+
+SELECT * FROM students_a
+INTERSECT
+SELECT * FROM students_b ;
+
+
+-- SQL Functions
+-- 1. Single Row Function . 
+-- 2. Mulit Row Function . 
+
+-- Nested Function 
+SELECT LENGTH(LOWER(LEFT('Maria', 2))) AS  nested_function ;
+
+
+-- 1. Single Row Function 
+
+-- a. String Functions
+
+-- 1. Manipulation 
+SELECT CONCAT('Akhilesh' , ' Chouhan') AS concated_string ; 
+
+SELECT UPPER('akhilesh') AS upper_string ; 
+
+SELECT LOWER('AKHILESH') AS lower_string ; 
+
+SELECT TRIM('     Akhilesh    ') AS trimmed_String ; 
+
+SELECT REPLACE('Akhilesh Sharma' , 'Sharma' , 'Chouhan' ) ; 
+
+
+-- 2. Calculation 
+
+SELECT LENGTH('Akhilesh Chouna') AS length ; 
+
+
+-- 3. Extract String 
+
+SELECT LEFT('Akhilesh chouhan' , 8) AS left_character ; 
+
+
+SELECT RIGHT('Akhilesh Chouhan' , 8) AS right_character ; 
+
+
+SELECT SUBSTRING('AKHILESH CHOUHAN' , 9 , 8) AS sub_string ;
+
+-- b. Numeric Function 
+
+SELECT ROUND(23.5454) AS round_value ; 
+
+
+SELECT ROUND(23.2325423 , 3) AS round_value ; 
+
+-- c. Date and Time Function
