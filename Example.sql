@@ -637,4 +637,135 @@ SELECT ROUND(23.5454) AS round_value ;
 
 SELECT ROUND(23.2325423 , 3) AS round_value ; 
 
--- c. Date and Time Function
+-- c. Date and Time Functions 
+
+-- 1. Part Extraction 
+
+
+-- a. Day Extraction . 
+SELECT DAY('2025-02-12') AS day_extract;
+
+-- b. Month Extraction . 
+
+SELECT MONTH('2027-03-23') AS month_extract ;
+
+-- c. Year Extraction . 
+SELECT YEAR('2023-12-11') AS year_extract ; 
+
+-- d. Quarter Extraction 
+
+SELECT QUARTER('2025-07-20') AS quarter_part ; 
+
+
+-- e. Week Extraction .
+SELECT WEEK('2025-07-23') AS week_part ; 
+
+
+-- F. MonthName Extraction . 
+
+SELECT MONTHNAME('2025-12-12') AS month_name ,
+       DAYNAME('2025-12-12') AS day_name ; 
+
+
+-- G. YearWeek Extraction . 
+SELECT YEARWEEK('2025-12-12')  AS extract_year_week;
+
+
+-- H. Extraction usign extract keyword . 
+SELECT EXTRACT(DAY FROM '2025-08-20') ,
+        EXTRACT(MONTH FROM '2025-08-20') ,
+        EXTRACT(YEAR FROM '2025-08-20');
+
+-- I. DATE_Format 
+SELECT DATE_FORMAT('2025-08-20' , '%Y-%m-01') ;
+
+
+-- J. LAST_DAY
+SELECT LAST_DAY('2025-02-12') ;
+
+
+-- 2. Format and casting
+
+SELECT DATE_FORMAT('2025-08-20', '%m/%d/%y');
+
+
+SELECT DATE_FORMAT('2025-08-23' , '%b %y') ;
+
+SELECT DATE_FORMAT('2025-08-23' , '%d %b %y') ;
+
+
+-- Number Formatting
+
+SELECT FORMAT(12345.34 , 2 ) ;
+
+
+SELECT FORMAT(123344.3423 , 4 , 'en_IN') ; 
+
+
+
+-- Casting
+SELECT CAST('2025-08-20' AS DATE);
+SELECT CAST('123' AS SIGNED);
+SELECT CAST(123.45 AS CHAR);
+
+
+
+-- Converting 
+
+SELECT CONVERT('2025-08-20', DATE);
+SELECT CONVERT(123.45, SIGNED);
+SELECT CONVERT(12345, CHAR);
+
+
+-- c. Calculation . 
+
+SELECT DATE_ADD('2025-08-20', INTERVAL 5 DAY);
+
+
+SELECT DATE_ADD('2025-09-23' , INTERVAL 2 MONTH) ; 
+
+
+SELECT DATE_ADD('2025-08-20', INTERVAL 1 YEAR);
+
+
+SELECT DATE_ADD('2025-08-20 10:00:00', INTERVAL 3 HOUR);
+
+
+SELECT DATEDIFF(CURDATE(), '2025-08-01');
+
+
+SELECT TIMESTAMPDIFF(HOUR, 
+    '2025-08-20 10:00:00',
+    '2025-08-20 15:00:00'
+);
+ 
+
+ -- Validation 
+
+ -- ISDATE(value) -> MYSQL Server
+
+
+ SELECT IFNULL(NULL , 0) ; 
+
+
+ SELECT COALESCE(NULL, NULL, 100, 200);
+
+
+SELECT NULLIF(10, 10);
+
+SELECT *
+FROM student_info
+WHERE email IS NOT NULL;
+
+
+SELECT 
+    salary ,
+    CASE 
+        WHEN salary >= 50000 THEN  'High'
+        WHEN salary >= 30000 THEN 'Medium'
+        ELSE  'low'
+    END AS salary_level
+
+FROM employees ;
+
+
