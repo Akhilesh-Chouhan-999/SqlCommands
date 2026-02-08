@@ -769,3 +769,175 @@ SELECT
 FROM employees ;
 
 
+-- MultiRow Function 
+
+
+-- 1. Aggregate Function
+
+CREATE TABLE employee_payroll (
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(50),
+    department VARCHAR(30),
+    salary INT,
+    experience_years INT
+);
+
+INSERT INTO employee_payroll 
+VALUES
+    (1, 'Amit',   'IT',        60000, 3),
+    (2, 'Riya',   'HR',        45000, 2),
+    (3, 'Kunal',  'IT',        80000, 6),
+    (4, 'Neha',   'Finance',   70000, 5),
+    (5, 'Arjun',  'HR',        50000, 4),
+    (6, 'Sneha',  'Finance',   65000, 3);
+
+
+-- 1. Count 
+
+SELECT COUNT(*) FROM employee_payroll ; 
+
+-- 2. MAX
+
+SELECT MAX(salary) FROM employee_payroll ;
+
+
+-- 3. AVG
+
+SELECT AVG(salary) FROM employee_payroll  ; 
+
+
+-- 4. SUM
+
+SELECT SUM(salary) FROM employee_payroll ;
+
+-- 5. MIN
+
+SELECT MIN(salary) FROM employee_payroll ; 
+
+
+-- SQL window function 
+CREATE TABLE employees (
+    emp_id INT,
+    name VARCHAR(20),
+    department VARCHAR(20),
+    salary INT,
+    join_date DATE
+);
+
+INSERT INTO employees
+ VALUES
+        (1, 'Amit', 'IT', 50000, '2022-01-10'),
+        (2, 'Ravi', 'IT', 60000, '2022-03-15'),
+        (3, 'Neha', 'HR', 40000, '2022-02-20'),
+        (4, 'Pooja', 'HR', 45000, '2022-05-10'),
+        (5, 'Karan', 'IT', 70000, '2023-01-01');
+
+
+-- 1. Window Aggregate function 
+
+-- Sum window  function . 
+
+SELECT 
+    emp_id , name , department , salary , join_date , 
+    SUM(salary) OVER(PARTITION BY department)
+FROM employees ; 
+
+
+-- AVG Window function 
+
+SELECT name, department, salary,
+       AVG(salary) OVER (PARTITION BY department) AS dept_avg_salary
+FROM employees;
+
+
+-- Count window function 
+SELECT name , department , salary ,
+        COUNT(*) OVER(PARTITION BY department)  AS dept_employee_count
+FROM employees ; 
+
+
+-- MIN and MAX window function . 
+SELECT name, department, salary,
+       MIN(salary) OVER (PARTITION BY department) AS min_salary,
+       MAX(salary) OVER (PARTITION BY department) AS max_salary
+FROM employees;
+
+
+-- 2 . Ranking Window functions . 
+
+
+-- Row_number()
+SELECT name, department, salary,
+       ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS row_num
+FROM employees;
+
+
+-- RANK
+
+SELECT name , department , salary,
+    RANK() OVER(
+        PARTITION BY department 
+        ORDER BY salary DESC
+    )
+FROM employees ; 
+
+
+-- DENSE_RANK
+
+SELECT name , department , salary ,
+    DENSE_RANK() OVER(
+        PARTITION BY department
+        ORDER BY salary DESC
+    ) as dense_Rank_val
+FROM employees ;
+
+-- 3. Value or Analytic Window function 
+
+-- 1. Lag function - LAG(column , offset , default)
+SELECT name , salary , department,
+    LAG(salary , 1 , 0) OVER(PARTITION BY department ORDER BY salary) AS prev_salary
+FROM employees ; 
+
+
+
+-- 2. Lead function - LEAD(column , offset , defult)
+SELECT name, salary,
+       LEAD(salary, 1, -1) OVER (ORDER BY salary) AS next_salary
+FROM employees;
+
+
+-- 3. FIRST_VALUE(column)
+
+SELECT name , department , salary ,
+       FIRST_VALUE(salary)
+       OVER(
+            PARTITION BY department 
+            ORDER BY salary DESC 
+       ) AS highest_value
+FROM employees ; 
+
+
+
+
+-- 4. LAST_VALUE(column)
+
+SELECT name, department, salary,
+       LAST_VALUE(salary)
+       OVER (
+           PARTITION BY department
+           ORDER BY salary DESC
+           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+       ) AS lowest_salary
+FROM employees;
+
+
+SELECT name, department, salary,
+       NTH_VALUE(salary , 7 )
+       OVER (
+           PARTITION BY department
+           ORDER BY salary
+           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+       ) AS lowest_salary
+FROM employees;
+
+
