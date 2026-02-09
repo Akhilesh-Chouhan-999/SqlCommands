@@ -941,3 +941,176 @@ SELECT name, department, salary,
 FROM employees;
 
 
+-- SubQuery 
+
+CREATE TABLE online_order_activity (
+    order_id INT PRIMARY KEY,
+    customer_code VARCHAR(10),
+    product_category VARCHAR(30),
+    order_amount INT,
+    payment_mode VARCHAR(20),
+    order_status VARCHAR(20),
+    order_date DATE
+);
+INSERT INTO online_order_activity
+ VALUES
+        (101, 'C001', 'Electronics', 45000, 'UPI', 'Delivered', '2024-01-05'),
+        (102, 'C002', 'Books', 1200, 'Card', 'Delivered', '2024-01-06'),
+        (103, 'C003', 'Fashion', 3500, 'COD', 'Cancelled', '2024-01-06'),
+        (104, 'C004', 'Home Decor', 7800, 'UPI', 'Delivered', '2024-01-07'),
+        (105, 'C005', 'Electronics', 22000, 'NetBanking', 'Returned', '2024-01-08'),
+        (106, 'C006', 'Groceries', 950, 'UPI', 'Delivered', '2024-01-08'),
+        (107, 'C007', 'Fashion', 4200, 'Card', 'Delivered', '2024-01-09'),
+        (108, 'C008', 'Books', 650, 'COD', 'Delivered', '2024-01-10'),
+        (109, 'C009', 'Electronics', 67000, 'UPI', 'Delivered', '2024-01-10'),
+        (110, 'C010', 'Groceries', 1300, 'NetBanking', 'Cancelled', '2024-01-11'),
+        (111, 'C011', 'Home Decor', 5600, 'Card', 'Delivered', '2024-01-12'),
+        (112, 'C012', 'Fashion', 2800, 'UPI', 'Delivered', '2024-01-12'),
+        (113, 'C013', 'Electronics', 15000, 'COD', 'Returned', '2024-01-13'),
+        (114, 'C014', 'Books', 900, 'UPI', 'Delivered', '2024-01-14'),
+        (115, 'C015', 'Groceries', 2100, 'Card', 'Delivered', '2024-01-14'),
+        (116, 'C016', 'Home Decor', 10400, 'NetBanking', 'Delivered', '2024-01-15'),
+        (117, 'C017', 'Fashion', 3900, 'UPI', 'Cancelled', '2024-01-16'),
+        (118, 'C018', 'Electronics', 32000, 'Card', 'Delivered', '2024-01-16'),
+        (119, 'C019', 'Books', 1500, 'COD', 'Delivered', '2024-01-17'),
+        (120, 'C020', 'Groceries', 800, 'UPI', 'Delivered', '2024-01-18');
+
+SELECT * FROM online_order_activity;
+
+
+-- Types of SubQueries 
+
+-- 1. Based on result type .
+
+-- a. Scalar Subquery 
+
+SELECT *
+FROM online_order_activity
+WHERE order_amount > (
+    SELECT AVG(order_amount) 
+    FROM online_order_activity
+) ; 
+
+
+-- b. Row SubQuery 
+
+
+    SELECT *
+    FROM online_order_activity
+    WHERE order_amount IN (
+        SELECT order_amount
+        FROM online_order_activity
+        WHERE product_category = 'Electronics'
+    );
+
+
+-- c. Table subquery 
+
+SELECT *
+FROM (
+    SELECT product_category, SUM(order_amount) AS total_sales
+    FROM online_order_activity
+    GROUP BY product_category
+) t
+WHERE total_sales > 20000;
+
+
+-- 2. SubQueries based on Dependency 
+
+-- a. Non-correlated SubQuery 
+
+    SELECT
+    *
+    FROM online_order_activity
+    WHERE order_amount >(
+        SELECT AVG(order_amount)
+        FROM online_order_activity
+    )  ;
+
+
+-- b. Correlated SubQuery 
+    SELECT *
+    FROM online_order_activity o1
+    WHERE EXISTS (
+        SELECT 1
+        FROM online_order_activity o2
+        WHERE o2.payment_mode = 'UPI'
+        AND o2.order_id = o1.order_id
+    );
+
+
+-- 3. SubQueries based on location and clause
+
+
+  -- a. SubQuery in Select . 
+
+    SELECT order_id ,
+           order_amount ,
+           (SELECT COUNT(*) FROM online_order_activity) AS total_orders
+    FROM online_order_activity ; 
+
+ -- b. SubQuery in From
+
+    SELECT product_category , total_sales
+    FROM(
+        SELECT product_category , SUM(order_amount) AS total_sales
+        FROM online_order_activity
+        GROUP BY product_category
+    ) t ; 
+
+-- c. SubQuery in Join
+
+    SELECT o.*
+    FROM online_order_activity o
+    JOIN (
+        SELECT order_id
+        FROM online_order_activity
+        WHERE order_status = 'Delivered'
+    ) d
+    ON o.order_id = d.order_id ;
+
+-- d Subquery  WHERE operation
+
+
+    -- 1. IN
+
+    SELECT
+    *
+    FROM
+    online_order_activity
+    WHERE product_category IN (
+        SELECT product_category
+        FROM online_order_activity
+        WHERE order_status = 'Cancelled'
+    ); 
+
+    -- 2. Any
+
+    SELECT *
+    FROM online_order_activity
+    WHERE order_amount > ANY (
+        SELECT order_amount
+        FROM online_order_activity
+        WHERE product_category = 'Books'
+    );
+
+    -- 3. All
+
+    SELECT *
+    FROM online_order_activity
+    WHERE order_amount > ALL (
+        SELECT order_amount
+        FROM online_order_activity
+        WHERE product_category = 'Groceries'
+    );
+
+    -- 4. Exists
+
+   SELECT *
+    FROM online_order_activity o1
+    WHERE EXISTS (
+        SELECT 1
+        FROM online_order_activity o2
+        WHERE o2.payment_mode = 'UPI'
+        AND o2.order_id = o1.order_id
+    );
