@@ -1114,3 +1114,108 @@ WHERE total_sales > 20000;
         WHERE o2.payment_mode = 'UPI'
         AND o2.order_id = o1.order_id
     );
+    
+
+-- CTE Query :  Common Table Expression 
+
+    CREATE TABLE online_order_activity (
+    order_id INT,
+    customer_id INT,
+    customer_name VARCHAR(50),
+    city VARCHAR(50),
+    order_amount INT,
+    payment_mode VARCHAR(20),
+    order_date DATE
+);
+
+INSERT INTO online_order_activity 
+VALUES
+        (101, 1, 'Amit', 'Bhopal', 1200, 'UPI', '2024-01-01'),
+        (102, 2, 'Neha', 'Indore', 800, 'CARD', '2024-01-02'),
+        (103, 3, 'Ravi', 'Delhi', 2000, 'UPI', '2024-01-03'),
+        (104, 1, 'Amit', 'Bhopal', 500, 'COD', '2024-01-04'),
+        (105, 4, 'Pooja', 'Mumbai', 3500, 'CARD', '2024-01-05'),
+        (106, 5, 'Karan', 'Pune', 1500, 'UPI', '2024-01-06'),
+        (107, 2, 'Neha', 'Indore', 2200, 'UPI', '2024-01-07'),
+        (108, 6, 'Sonal', 'Delhi', 900, 'COD', '2024-01-08'),
+        (109, 3, 'Ravi', 'Delhi', 1700, 'CARD', '2024-01-09'),
+        (110, 7, 'Rahul', 'Bhopal', 2600, 'UPI', '2024-01-10'),
+        (111, 8, 'Ankit', 'Mumbai', 4000, 'UPI', '2024-01-11'),
+        (112, 9, 'Meena', 'Pune', 1100, 'CARD', '2024-01-12'),
+        (113, 4, 'Pooja', 'Mumbai', 1800, 'UPI', '2024-01-13'),
+        (114, 10, 'Vikas', 'Delhi', 700, 'COD', '2024-01-14'),
+        (115, 11, 'Suresh', 'Indore', 2900, 'UPI', '2024-01-15'),
+        (116, 12, 'Rina', 'Bhopal', 1300, 'CARD', '2024-01-16'),
+        (117, 13, 'Manoj', 'Delhi', 2100, 'UPI', '2024-01-17'),
+        (118, 14, 'Kriti', 'Mumbai', 900, 'COD', '2024-01-18'),
+        (119, 15, 'Deepak', 'Pune', 1600, 'UPI', '2024-01-19'),
+        (120, 16, 'Nitin', 'Delhi', 2400, 'CARD', '2024-01-20');
+
+ -- Example of CTE : 
+
+        WITH upi_orders AS (
+            SELECT * 
+            FROM online_order_activity
+            WHERE payment_mode = 'UPI'
+        )
+        SELECT * 
+        FROM upi_orders
+        WHERE order_amount > 1500 ;
+
+-- Type 1 . Non-Recursive CTE : Executes the query without  repeatation . 
+
+    WITH delhi_orders AS (
+        SELECT *
+        FROM online_order_activity
+        WHERE city = 'Delhi' 
+    )
+
+    SELECT 
+    * 
+    FROM
+    delhi_orders
+    WHERE order_amount > 2000 ; 
+
+
+    -- Type 1.1 : Standalone CTE :
+
+    WITH high_value_orders AS(
+        SELECT
+        *
+        FROM
+        online_order_activity
+        WHERE order_amount > 2500 
+    )
+    SELECT * FROM high_value_orders ; 
+
+
+    -- Type 1.2 : Nested CTE : 
+
+    WITH upi_orders AS (
+        SELECT
+        *
+        FROM
+        online_order_activity
+        WHERE
+        payment_mode = 'UPI'
+    ) ,
+    high_value_upi_orders AS (
+        SELECT
+        *
+        FROM
+        upi_orders
+        WHERE order_amount > 2000
+    )
+    SELECT * FROM high_value_upi_orders ;
+
+    -- Type 2. Recursive CTE : Self-Referencing query that repeatedly process data until a specific condition meet . 
+
+WITH RECURSIVE Series AS (
+    SELECT 1 AS my_number -- Anchor Query 
+    UNION ALL
+    SELECT my_number + 1 -- Recursive Query
+    FROM Series
+    WHERE my_number < 20
+)
+SELECT * FROM Series; -- Main Query 
+
