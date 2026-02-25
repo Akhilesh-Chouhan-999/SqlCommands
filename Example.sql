@@ -952,6 +952,7 @@ CREATE TABLE online_order_activity (
     order_status VARCHAR(20),
     order_date DATE
 );
+
 INSERT INTO online_order_activity
  VALUES
         (101, 'C001', 'Electronics', 45000, 'UPI', 'Delivered', '2024-01-05'),
@@ -1219,3 +1220,258 @@ WITH RECURSIVE Series AS (
 )
 SELECT * FROM Series; -- Main Query 
 
+
+-- View in SQL : 
+
+
+DESCRIBE employees;
+
+
+CREATE VIEW high_salary_employees AS
+SELECT id, name, salary
+FROM employees
+WHERE salary > 50000;
+
+
+
+CREATE TABLE farmer (
+    farmer_id INT PRIMARY KEY AUTO_INCREMENT,
+    farmer_name VARCHAR(100) NOT NULL,
+    age INT,
+    village VARCHAR(100),
+    land_area DECIMAL(10,2),
+    crop_type VARCHAR(100)
+);
+
+
+INSERT INTO farmer (farmer_name, age, village, land_area, crop_type)
+VALUES 
+        ('Ramesh', 45, 'Rampur', 12.5, 'Wheat'),
+        ('Suresh', 38, 'Lakshmipur', 8.0, 'Rice'),
+        ('Mahesh', 50, 'Devgaon', 15.75, 'Cotton');
+
+
+
+SELECT
+*
+FROM
+farmer ; 
+
+
+-- 1. Creation of view 
+
+CREATE VIEW all_farmers AS
+SELECT farmer_id, farmer_name, village, crop_type
+FROM farmer;
+
+SELECT 
+* 
+FROM 
+all_farmers
+;
+
+
+CREATE VIEW large_land_farmers AS
+SELECT farmer_name, land_area, village
+FROM farmer
+WHERE land_area > 10;
+
+
+SELECT 
+*
+FROM
+large_land_farmers;
+
+
+
+CREATE VIEW rampur_farmers AS
+SELECT farmer_name, crop_type
+FROM farmer
+WHERE village = 'Rampur';
+
+
+
+SELECT 
+* 
+FROM 
+rampur_farmers ;
+
+
+-- 2. Updation of view 
+
+CREATE OR REPLACE VIEW all_farmers AS
+SELECT farmer_id, farmer_name, village, crop_type, land_area
+FROM farmer;
+
+
+
+-- 3. Drop of view . 
+
+DROP VIEW rampur_farmers ; 
+
+
+CREATE VIEW किसान AS
+SELECT 
+    farmer_name AS किसान_नाम,
+    village AS गांव,
+    crop_type AS फसल
+FROM farmer;
+
+
+--  Types of Tables : 
+
+
+-- 1. Permanent Table 
+
+-- a. Create / Insert Method 
+
+CREATE TABLE sales (
+    id INT,
+    amount INT
+);
+
+
+INSERT INTO sales
+VALUES (1 , 100) ,
+       (2 , 200) ,
+       (3 , 300) ; 
+
+
+SELECT * FROM sales ; 
+
+-- b. CTAS ( Create Table as select )
+
+CREATE TABLE sales_data
+SELECT * FROm sales ;
+
+
+-- 2. Temporary Table 
+
+CREATE TEMPORARY TABLE temp_sales (
+    id INT,
+    amount INT
+);
+
+INSERT INTO temp_sales VALUES (1, 1000);
+INSERT INTO temp_sales VALUES (2, 2000);
+
+SELECT * FROM temp_sales;
+
+
+DROP TABLE farmer ; 
+
+
+-- Stored Procedure
+
+
+SELECT DATABASE();
+
+CREATE TABLE farmer (
+    farmer_id INT PRIMARY KEY AUTO_INCREMENT,
+    farmer_name VARCHAR(100),
+    village VARCHAR(100),
+    crop_type VARCHAR(100),
+    income INT
+);
+
+
+INSERT INTO farmer (farmer_name, village, crop_type, income)
+VALUES
+        ('Ramesh', 'Rampur', 'Wheat', 150000),
+        ('Suresh', 'Lakshmipur', 'Rice', 90000),
+        ('Mahesh', 'Devgaon', 'Cotton', 200000);
+
+DELIMITER //
+CREATE PROCEDURE GetHighIncomeFarmers(IN min_income INT)
+BEGIN
+    SELECT farmer_name, village, income
+    FROM farmer
+    WHERE income > min_income;
+END //
+DELIMITER ;
+
+CALL GetHighIncomeFarmers(100000);
+
+DELIMITER //
+
+CREATE PROCEDURE SafeTransferIncome(
+    IN from_farmer INT,
+    IN to_farmer INT,
+    IN amount INT
+)
+BEGIN
+    -- Declare error handler
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'Transaction Failed. Rolled Back.' AS Message;
+    END;
+
+    -- Start transaction
+    START TRANSACTION;
+
+    -- Deduct income
+    UPDATE farmer
+    SET income = income - amount
+    WHERE farmer_id = from_farmer;
+
+    -- Add income
+    UPDATE farmer
+    SET income = income + amount
+    WHERE farmer_id = to_farmer;
+
+    -- Commit if no error
+    COMMIT;
+
+    SELECT 'Transaction Successful' AS Message;
+
+END //
+
+DELIMITER ;
+
+
+
+CALL SafeTransferIncome(1, 2, 5000);
+
+
+-- Trigger in DBMS : 
+
+-- DELIMITER //
+-- CREATE TRIGGER trigger_name
+-- {BEFORE | AFTER} {INSERT | UPDATE | DELETE}
+-- ON table_name
+-- FOR EACH ROW
+-- BEGIN
+
+    -- SQL statements go here
+    -- You can use:
+    -- NEW.column_name
+    -- OLD.column_name
+
+-- END //
+-- DELIMITER ;
+
+CREATE TABLE farmer_log (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    farmer_id INT,
+    action_type VARCHAR(50),
+    action_time DATETIME
+);
+
+
+DELIMITER //
+
+CREATE TRIGGER after_farmer_insert
+AFTER INSERT ON farmer
+FOR EACH ROW
+BEGIN
+    INSERT INTO farmer_log (farmer_id, action_type, action_time)
+    VALUES (NEW.farmer_id, 'INSERT', NOW());
+END //
+
+DELIMITER ;
+
+
+
+INSERT INTO farmer (farmer_name, village, crop_type, income)
+VALUES ('Amit', 'Rampur', 'Wheat', 120000);
